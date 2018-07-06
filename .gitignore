@@ -1,3 +1,7 @@
 /target/
 /image.png
 /nbproject/
+
+.classpath
+.project
+.settings/

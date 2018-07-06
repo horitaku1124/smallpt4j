@@ -10,7 +10,6 @@ that is released under the MIT License.
 
 package naoki.smallpt;
 
-import static naoki.smallpt.SmallPT.Reflection.DIFFUSE;
 import static org.apache.commons.math3.util.FastMath.abs;
 import static org.apache.commons.math3.util.FastMath.asin;
 import static org.apache.commons.math3.util.FastMath.atan2;
@@ -36,146 +35,28 @@ import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
+import naoki.smallpt.primitives.Vec;
+import naoki.smallpt.primitives.Reflection;
+import naoki.smallpt.primitives.Ray;
+import naoki.smallpt.primitives.Point;
+import naoki.smallpt.primitives.combination.Col;
+import naoki.smallpt.textures.Surface;
+import naoki.smallpt.textures.Texture;
+import naoki.smallpt.textures.SolidTexture;
+import naoki.smallpt.textures.Sphere;
+import naoki.smallpt.textures.PolygonSurface;
+import static naoki.smallpt.primitives.Reflection.DIFFUSE;
+
 public class SmallPT {
 
-    private static final int SAMPLES_DEFAULT = 40;
+    public static final int SAMPLES_DEFAULT = 40;
 
-    private static final double GAMMA = 2.2;
-    private static final double RECIP_GAMMA = 1 / GAMMA;
-    private static final double EPS = 1e-4;
-    private static final double INF = 1e20;
+    public static final double GAMMA = 2.2;
+    public static final double RECIP_GAMMA = 1 / GAMMA;
+    public static final double EPS = 1e-4;
+    public static final double INF = 1e20;
 
-    static final class Vec {        // Usage: time ./smallpt 5000  xv image.ppm
-        static final Vec UNIT_X = new Vec(1, 0, 0);
-        static final Vec UNIT_Y = new Vec(0, 1, 0);
-        static final Vec ZERO = new Vec();
-
-        double x, y, z;                  // position, also color (r,g,b)
-
-        public Vec(double x, double y, double z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        Vec() {
-            this(0, 0, 0);
-        }
-
-        Vec add(Vec b) {
-            return new Vec(x + b.x, y + b.y, z + b.z);
-        }
-
-        Vec sub(Vec b) {
-            return new Vec(x - b.x, y - b.y, z - b.z);
-        }
-
-        Vec mul(double b) {
-            return new Vec(x * b, y * b, z * b);
-        }
-
-        Vec vecmul(Vec b) {
-            return new Vec(x * b.x, y * b.y, z * b.z);
-        }
-
-        Vec normalize() {
-            double dist = distant();
-            if (dist == 0) {
-                return UNIT_X;
-            }
-            x /= dist;
-            y /= dist;
-            z /= dist;
-            return this;
-        }
-        double distant() {
-            return sqrt(x * x + y * y + z * z);
-        }
-
-        double dot(Vec b) {
-            return x * b.x + y * b.y + z * b.z;
-        } // cross:
-
-        Vec mod(Vec b) {
-            return new Vec(y * b.z - z * b.y, z * b.x - x * b.z, x * b.y - y * b.x);
-        }
-    }
-
-    static final class Ray {
-
-        final Vec obj, dist;
-
-        public Ray(Vec o, Vec d) {
-            this.obj = o;
-            this.dist = d;
-        }
-
-    }
-
-    static enum Reflection {
-        DIFFUSE, SPECULAR, REFRECTION
-    }  // material types, used in radiance()
-
-    static abstract class Surface {
-        final Vec pos;
-        final Texture texture;
-
-        public Surface(Vec pos, Texture texture) {
-            this.pos = pos;
-            this.texture = texture;
-        }
-
-        public Surface(Vec pos, Vec emission, Vec color, Reflection reflection) {
-            this(pos, new SolidTexture(emission, color, reflection));
-        }
-        
-        abstract double intersect(Ray y, Surface[] robj);
-        abstract void position(Vec p, Ray r, Vec[] n, Col[] c);
-        abstract Point makeXY(Vec p);
-    }
     
-    static final class Sphere extends Surface {
-
-        final double rad;       // radius
-
-        public Sphere(double rad, Vec p, Vec e, Vec c, Reflection refl) {
-            super(p, e, c, refl);
-            this.rad = rad;
-        }
-        public Sphere(double rad, Vec p, Texture texture) {
-            super(p, texture);
-            this.rad = rad;
-        }
-
-        @Override
-        double intersect(Ray r, Surface[] robj) { // returns distance, 0 if nohit
-            Vec op = pos.sub(r.obj); // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
-            double t,
-                    b = op.dot(r.dist),
-                    det = b * b - op.dot(op) + rad * rad;
-            if (det < 0) {
-                return 0;
-            }
-            det = sqrt(det);
-            robj[0] = this;
-            return (t = b - det) > EPS ? t : ((t = b + det) > EPS ? t : 0);
-        }
-        
-        @Override
-        void position(Vec x, Ray r, Vec[] n, Col[] c) {
-            n[0] = x.sub(pos).normalize();
-            c[0] = texture.getCol(this, x);
-        }
-
-        @Override
-        Point makeXY(Vec x) {
-            Vec position = x.sub(pos).mul(1 / rad);
-            double phi = atan2(position.z, position.x);
-            double theta = asin(position.y);
-            return new Point(1 - (phi + Math.PI) / (2 * Math.PI), (theta + Math.PI / 2) / Math.PI);
-        }
-        
-    }
     
     static final class Plane extends Surface {
         final double width, height;
@@ -190,7 +71,7 @@ public class SmallPT {
             this.height = y;
         }
         @Override
-        double intersect(Ray ray, Surface[] robj) {
+        public double intersect(Ray ray, Surface[] robj) {
             if (ray.dist.z < EPS && ray.dist.z > -EPS) {
                 return 0;
             }
@@ -214,49 +95,14 @@ public class SmallPT {
         static final Vec TO_BACK = new Vec(0, 0, -1);
         
         @Override
-        void position(Vec p, Ray r, Vec[] n, Col[] c) {
+        public void position(Vec p, Ray r, Vec[] n, Col[] c) {
             n[0] =r.dist.z > 0 ? TO_BACK : TO_FRONT;
             c[0] =  texture.getCol(this, p);
         }
         
         @Override
-        Point makeXY(Vec p) {
+        public Point makeXY(Vec p) {
             return new Point((p.x - pos.x) / width, (p.y - pos.y) / height);
-        }
-    }
-    static final class Point {
-        final double x, y;
-
-        public Point(double x, double y) {
-            this.x = x;
-            this.y = y;
-        }
-    }
-    static final class Col {
-        final Vec emission, color;
-        final Reflection reflection;
-
-        public Col(Vec emission, Vec color,Reflection reflection) {
-            this.emission = emission;
-            this.color = color;
-            this.reflection= reflection;
-        }
-    }
-    static abstract class Texture {
-        abstract Col getCol(Surface s, Vec x);
-        boolean isHit(Surface s, Vec x)  {
-            return true;
-        }
-    }
-    static class SolidTexture extends Texture {
-        final Col col;
-
-        public SolidTexture(Vec emission, Vec color, Reflection ref) {
-            this.col = new Col(emission, color, ref);
-        }
-        @Override
-        Col getCol(Surface s, Vec x) {
-            return col;
         }
     }
     static class CheckTexture extends Texture {
@@ -270,7 +116,7 @@ public class SmallPT {
         }
 
         @Override
-        Col getCol(Surface s, Vec x) {
+        public Col getCol(Surface s, Vec x) {
             Point p = s.makeXY(x);
             return (under(p.x / freq) - 0.5) * (under(p.y / freq) - 0.5) > 0 ? col1 : col2;
         }
@@ -303,7 +149,7 @@ public class SmallPT {
         }
         
         @Override
-        Col getCol(Surface s, Vec x) {
+        public Col getCol(Surface s, Vec x) {
             int rgb = getRgb(s, x);
             return new Col(emission, new Vec(intToDouble(rgb >> 16), intToDouble(rgb >> 8), intToDouble(rgb)), DIFFUSE);
         }
@@ -313,7 +159,7 @@ public class SmallPT {
         }
 
         @Override
-        boolean isHit(Surface s, Vec x) {
+        public boolean isHit(Surface s, Vec x) {
             int rgb = getRgb(s, x);
             return rgb >> 24 != 0;
         }
@@ -332,146 +178,21 @@ public class SmallPT {
         }
 
         @Override
-        Col getCol(Surface s, Vec x) {
+        public Col getCol(Surface s, Vec x) {
             return new Col(emission, color, DIFFUSE);
         }
 
         @Override
-        boolean isHit(Surface s, Vec x) {
+        public boolean isHit(Surface s, Vec x) {
             int rgb = getRgb(s, x);
             return (rgb >> 24 != 0) && (rgb >> 16 & 255) < 80;
         }
         
     }
 
-    static class Polygon extends Surface {
-        final Vec p1, p3;
-        final Vec normal;
-        final Vec e1, e2;
 
-        public Polygon(Vec p1, Vec p2, Vec p3, Texture texture) {
-            super(p2, texture);
-            this.p1 = p1;
-            this.p3 = p3;
-            e1 = p1.sub(pos);
-            e2 = p3.sub(pos);
-            normal = e1.mod(e2).normalize();
-        }
-        private double det(Vec v1, Vec v2, Vec v3) {
-            return v1.x * v2.y * v3.z + v2.x * v3.y * v1.z + v3.x * v1.y * v2.z
-                    -v1.x * v3.y * v2.z - v2.x * v1.y * v3.z - v3.x * v2.y * v1.z;
-        }
-        @Override
-        double intersect(Ray y, Surface[] robj) {
-            Vec ray = y.dist.mul(-1);
-            double deno = det(e1, e2, ray);
-            if (deno <= 0) {
-                return 0;
-            }
-            
-            Vec d = y.obj.sub(pos);
-            double u = det(d, e2, ray) / deno;
-            if (u < 0 || u > 1) {
-                return 0;
-            }
-            double v = det(e1, d, ray) / deno;
-            if (v < 0 || u + v > 1) {
-                return 0;
-            }
-            double t = det(e1, e2, d) / deno;
-            if (t < 0) {
-                return 0;
-            }
-            robj[0] = this;
-            return t;
-        }
 
-        @Override
-        void position(Vec p, Ray r, Vec[] n, Col[] c) {
-            n[0] = normal;
-            c[0] = texture.getCol(this, p);
-        }
-
-        @Override
-        Point makeXY(Vec p) {
-            return new Point(0, 0);
-        }
-    }
-
-    static class PolygonSurface extends Surface {
-        final Vec center;
-        final double rad;
-        final Polygon[] polygons;
-        final Vec[] vertexes;
-        final Sphere bound;
-
-        public PolygonSurface(double rad, Vec pos, double[] vers, int[] surs, Texture tex) {
-            super(pos, tex);
-            Vec[] vs = IntStream.range(0, vers.length / 3)
-                    .map(i -> i * 3)
-                    .mapToObj(i -> new Vec(vers[i], 20 - vers[i + 1], vers[i + 2]))
-                    .toArray(Vec[]::new);
-
-            double minX = Double.POSITIVE_INFINITY, maxX = Double.NEGATIVE_INFINITY;
-            double minY = Double.POSITIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY;
-            double minZ = Double.POSITIVE_INFINITY, maxZ = Double.NEGATIVE_INFINITY;
-            for (Vec ver : vs) {
-                minX = min(minX, ver.x);
-                maxX = max(maxX, ver.x);
-                minY = min(minY, ver.y);
-                maxY = max(maxY, ver.y);
-                minZ = min(minZ, ver.z);
-                maxZ = max(maxZ, ver.z);
-            }
-            center = new Vec((minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2);
-            double r = Double.NEGATIVE_INFINITY;
-            for (Vec ver : vs) {
-                r = max(r, center.sub(ver).distant());
-            }
-            this.rad = rad;
-            double t = rad / r;
-            bound = new Sphere(rad, pos, tex);
-            vertexes = Arrays.stream(vs)
-                    .map(v -> v.sub(center).mul(t).add(pos))
-                    .toArray(Vec[]::new);
-            polygons = IntStream.range(0, surs.length / 5)
-                    .mapToObj(i -> i * 5)
-                    .flatMap(i -> Stream.of(new Polygon(vertexes[surs[i]], vertexes[surs[i + 1]], vertexes[surs[i + 2]], tex),
-                                             new Polygon(vertexes[surs[i + 2]], vertexes[surs[i + 3]], vertexes[surs[i]], tex)))
-                    .filter(p -> p.pos != p.p1 && p.p1 != p.p3 && p.p3 != p.pos)
-                    .toArray(Polygon[]::new);
-        }
-
-        @Override
-        double intersect(Ray y, Surface[] robj) {
-            double dist = bound.intersect(y, robj);
-            if (dist == 0) {
-                return 0;
-            }
-            double t = INF;
-            for (Surface obj : polygons) {
-                Surface[] cobj = {null};
-                double d = obj.intersect(y, cobj);
-                if (d != 0 && d < t) {
-                    t = d;
-                    robj[0] = obj;
-                }
-            }
-            return t;
-        }
-
-        @Override
-        void position(Vec p, Ray r, Vec[] n, Col[] c) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        Point makeXY(Vec p) {
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    static final Surface spheres[] = {//Scene: radius, position, emission, color, material
+    final Surface spheres[] = {//Scene: radius, position, emission, color, material
         new Sphere(1e5,  new Vec(1e5 + 1, 40.8, 81.6),   new Vec(), new Vec(.75, .25, .25), Reflection.DIFFUSE),//Left
         new Sphere(1e5,  new Vec(-1e5 + 99, 40.8, 81.6), new Vec(), new Vec(.25, .25, .75), Reflection.DIFFUSE),//Rght
         new Sphere(1e5,  new Vec(50, 40.8, 1e5),         new Vec(), new Vec(.75, .75, .75), Reflection.DIFFUSE),//Back
@@ -495,7 +216,7 @@ public class SmallPT {
         return min(255, (int) (pow(clamp(x), RECIP_GAMMA) * 255 + .5));
     }
 
-    static boolean intersect(Ray r, double[] t, Surface[] robj) {
+    boolean intersect(Ray r, double[] t, Surface[] robj) {
         t[0] = INF;
         for (Surface obj : spheres) {
             Surface[] cobj = {null};
@@ -512,7 +233,7 @@ public class SmallPT {
         return ThreadLocalRandom.current().nextDouble();
     }
     
-    static Vec radiance(Ray r, int depth) {
+    Vec radiance(Ray r, int depth) {
         double[] t = {0};                               // distance to intersection
         Surface[] robj = {null};
         Vec[] rn = {null};
@@ -582,6 +303,7 @@ public class SmallPT {
     }
 
     public static void main(String... argv) throws IOException {
+        SmallPT sp = new SmallPT();
         int w = 1024,
                 h = 768,
                 samps = (argv.length > 0 ? Integer.parseInt(argv[0]) : SAMPLES_DEFAULT )/ 4; // # samples
@@ -609,7 +331,7 @@ public class SmallPT {
                                     dy = r2 < 1 ? sqrt(r2) - 1 : 1 - sqrt(2 - r2);
                             Vec d = cx.mul(((sx + .5 + dx) / 2 + x) / w - .5)
                                     .add(cy.mul(((sy + .5 + dy) / 2 + y) / h - .5)).add(cam.dist);
-                            r = r.add(radiance(new Ray(cam.obj.add(d.mul(140)), d.normalize()), 0));
+                            r = r.add(sp.radiance(new Ray(cam.obj.add(d.mul(140)), d.normalize()), 0));
                         } // Camera rays are pushed ^^^^^ forward to start in interior
                         r = r.mul(1. / samps);
                         c[i] = c[i].add(new Vec(clamp(r.x), clamp(r.y), clamp(r.z)).mul(.25));
@@ -631,6 +353,7 @@ public class SmallPT {
         out.setRGB(0, 0, w, h, imagesource, 0, w);
         File f = new File("image.png");
         ImageIO.write(out, "png", f);
+        System.out.println("Version 1.0.1");
 
     }
 
