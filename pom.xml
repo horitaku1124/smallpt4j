@@ -44,7 +44,7 @@
                 </descriptorRefs>
                 <archive>
                     <manifest>
-                        <mainClass>main.Main</mainClass>
+                        <mainClass>naoki.smallpt.SmallPT</mainClass>
                     </manifest>
                 </archive>
             </configuration>
