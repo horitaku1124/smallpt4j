@@ -10,11 +10,9 @@ that is released under the MIT License.
 
 package naoki.smallpt;
 
+import static naoki.smallpt.primitives.Reflection.DIFFUSE;
 import static org.apache.commons.math3.util.FastMath.abs;
-import static org.apache.commons.math3.util.FastMath.asin;
-import static org.apache.commons.math3.util.FastMath.atan2;
 import static org.apache.commons.math3.util.FastMath.cos;
-import static org.apache.commons.math3.util.FastMath.floor;
 import static org.apache.commons.math3.util.FastMath.max;
 import static org.apache.commons.math3.util.FastMath.min;
 import static org.apache.commons.math3.util.FastMath.pow;
@@ -24,173 +22,34 @@ import static org.apache.commons.math3.util.FastMath.sqrt;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
-import naoki.smallpt.primitives.Vec;
-import naoki.smallpt.primitives.Reflection;
 import naoki.smallpt.primitives.Ray;
-import naoki.smallpt.primitives.Point;
+import naoki.smallpt.primitives.Reflection;
+import naoki.smallpt.primitives.Vec;
 import naoki.smallpt.primitives.combination.Col;
-import naoki.smallpt.textures.Surface;
-import naoki.smallpt.textures.Texture;
+import naoki.smallpt.textures.BitmapTexture;
+import naoki.smallpt.textures.EmissionTexture;
+import naoki.smallpt.textures.PolygonSurface;
 import naoki.smallpt.textures.SolidTexture;
 import naoki.smallpt.textures.Sphere;
-import naoki.smallpt.textures.PolygonSurface;
-import static naoki.smallpt.primitives.Reflection.DIFFUSE;
+import naoki.smallpt.textures.surface.Plane;
+import naoki.smallpt.textures.surface.Surface;
 
 public class SmallPT {
-
     public static final int SAMPLES_DEFAULT = 40;
 
     public static final double GAMMA = 2.2;
     public static final double RECIP_GAMMA = 1 / GAMMA;
     public static final double EPS = 1e-4;
     public static final double INF = 1e20;
-
-    
-    
-    static final class Plane extends Surface {
-        final double width, height;
-        public Plane(double x, double y, Vec pos, Vec emission, Vec color, Reflection reflection) {
-            super(pos, emission, color, reflection);
-            this.width = x;
-            this.height = y;
-        }
-        public Plane(double x, double y, Vec pos, Texture tex) {
-            super(pos, tex);
-            this.width = x;
-            this.height = y;
-        }
-        @Override
-        public double intersect(Ray ray, Surface[] robj) {
-            if (ray.dist.z < EPS && ray.dist.z > -EPS) {
-                return 0;
-            }
-            double d = (pos.z - ray.obj.z) / ray.dist.z;
-            if (d < 0) {
-                return 0;
-            }
-            Vec x = ray.obj.add(ray.dist.mul(d));
-            Vec p = x.sub(pos);
-            if (p.x < 0 || p.x > width || p.y < 0 || p.y > height) {
-                return 0;
-            }
-            if (!texture.isHit(this, x)) {
-                return 0;
-            }
-            robj[0] = this;
-            return d;
-        }
-
-        static final Vec TO_FRONT = new Vec(0, 0, 1);
-        static final Vec TO_BACK = new Vec(0, 0, -1);
-        
-        @Override
-        public void position(Vec p, Ray r, Vec[] n, Col[] c) {
-            n[0] =r.dist.z > 0 ? TO_BACK : TO_FRONT;
-            c[0] =  texture.getCol(this, p);
-        }
-        
-        @Override
-        public Point makeXY(Vec p) {
-            return new Point((p.x - pos.x) / width, (p.y - pos.y) / height);
-        }
-    }
-    static class CheckTexture extends Texture {
-        final Col col1, col2;
-        final double freq;
-
-        public CheckTexture(Vec col1, Vec col2, double freq) {
-            this.col1 = new Col(Vec.ZERO, col1, DIFFUSE);
-            this.col2 = new Col(Vec.ZERO, col2, DIFFUSE);
-            this.freq = freq;
-        }
-
-        @Override
-        public Col getCol(Surface s, Vec x) {
-            Point p = s.makeXY(x);
-            return (under(p.x / freq) - 0.5) * (under(p.y / freq) - 0.5) > 0 ? col1 : col2;
-        }
-        private double under(double d) {
-            return d - floor(d);
-        }
-    }
-    
-    static class BitmapTexture extends Texture {
-        final BufferedImage img;
-        final int width, height;
-        final Vec emission = Vec.ZERO;
-        final double enhance;
-        final double offset;
-
-        public BitmapTexture(String file, double offset, double e) {
-            try {
-                img = ImageIO.read(SmallPT.class.getResourceAsStream(file));
-                width = img.getWidth(null);
-                height = img.getHeight(null);
-                this.offset = offset;
-                enhance = e;
-            } catch (IOException ex) {
-                throw new UncheckedIOException(ex);
-            }
-        }
-        
-        public BitmapTexture(String file) {
-            this(file, 0, 1);
-        }
-        
-        @Override
-        public Col getCol(Surface s, Vec x) {
-            int rgb = getRgb(s, x);
-            return new Col(emission, new Vec(intToDouble(rgb >> 16), intToDouble(rgb >> 8), intToDouble(rgb)), DIFFUSE);
-        }
-        
-        private double intToDouble(int c) {
-            return pow((c & 255) / 255., GAMMA) * enhance;
-        }
-
-        @Override
-        public boolean isHit(Surface s, Vec x) {
-            int rgb = getRgb(s, x);
-            return rgb >> 24 != 0;
-        }
-        
-        protected int getRgb(Surface s, Vec x) {
-            Point pos = s.makeXY(x);
-            return img.getRGB((int)((pos.x + offset) * width) % width, (int)((1 - pos.y) * height));
-        }
-    }
-    
-    static class EmissionTexture extends BitmapTexture {
-        final Vec emission = new Vec(12, 12, 12);
-        final Vec color = Vec.ZERO;
-        public EmissionTexture(String file) {
-            super(file);
-        }
-
-        @Override
-        public Col getCol(Surface s, Vec x) {
-            return new Col(emission, color, DIFFUSE);
-        }
-
-        @Override
-        public boolean isHit(Surface s, Vec x) {
-            int rgb = getRgb(s, x);
-            return (rgb >> 24 != 0) && (rgb >> 16 & 255) < 80;
-        }
-        
-    }
-
-
 
     final Surface spheres[] = {//Scene: radius, position, emission, color, material
         new Sphere(1e5,  new Vec(1e5 + 1, 40.8, 81.6),   new Vec(), new Vec(.75, .25, .25), Reflection.DIFFUSE),//Left
@@ -353,8 +212,6 @@ public class SmallPT {
         out.setRGB(0, 0, w, h, imagesource, 0, w);
         File f = new File("image.png");
         ImageIO.write(out, "png", f);
-        System.out.println("Version 1.0.1");
-
+        System.out.println("Version 1.0.2");
     }
-
 }

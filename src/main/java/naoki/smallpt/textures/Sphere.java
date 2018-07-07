@@ -6,7 +6,7 @@ import naoki.smallpt.primitives.Vec;
 import naoki.smallpt.primitives.Point;
 import naoki.smallpt.primitives.Ray;
 import naoki.smallpt.primitives.combination.Col;
-
+import naoki.smallpt.textures.surface.Surface;
 
 import static org.apache.commons.math3.util.FastMath.abs;
 import static org.apache.commons.math3.util.FastMath.asin;

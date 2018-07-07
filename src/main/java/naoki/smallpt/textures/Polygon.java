@@ -4,6 +4,7 @@ import naoki.smallpt.primitives.Vec;
 import naoki.smallpt.primitives.Point;
 import naoki.smallpt.primitives.Ray;
 import naoki.smallpt.primitives.combination.Col;
+import naoki.smallpt.textures.surface.Surface;
 
 public class Polygon extends Surface {
     final Vec p1, p3;

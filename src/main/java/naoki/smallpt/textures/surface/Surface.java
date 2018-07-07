@@ -1,10 +1,12 @@
-package naoki.smallpt.textures;
+package naoki.smallpt.textures.surface;
 
 import naoki.smallpt.primitives.Vec;
 import naoki.smallpt.primitives.Point;
 import naoki.smallpt.primitives.Ray;
 import naoki.smallpt.primitives.Reflection;
 import naoki.smallpt.primitives.combination.Col;
+import naoki.smallpt.textures.SolidTexture;
+import naoki.smallpt.textures.Texture;
 
 public abstract class Surface {
     final public Vec pos;

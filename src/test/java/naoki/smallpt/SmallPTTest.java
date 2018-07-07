@@ -6,9 +6,9 @@ import static org.junit.Assert.*;
 
 import naoki.smallpt.primitives.Vec;
 import naoki.smallpt.primitives.Ray;
-import naoki.smallpt.textures.Surface;
 import naoki.smallpt.textures.Polygon;
 import naoki.smallpt.textures.PolygonSurface;
+import naoki.smallpt.textures.surface.Surface;
 
 /**
  *

@@ -3,6 +3,7 @@ package naoki.smallpt.textures;
 import naoki.smallpt.primitives.Vec;
 import naoki.smallpt.primitives.Reflection;
 import naoki.smallpt.primitives.combination.Col;
+import naoki.smallpt.textures.surface.Surface;
 
 public class SolidTexture extends Texture {
     final Col col;

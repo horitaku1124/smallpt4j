@@ -1,6 +1,7 @@
 package naoki.smallpt.textures;
 
 import naoki.smallpt.primitives.combination.Col;
+import naoki.smallpt.textures.surface.Surface;
 import naoki.smallpt.primitives.Vec;
 
 public abstract class Texture {
