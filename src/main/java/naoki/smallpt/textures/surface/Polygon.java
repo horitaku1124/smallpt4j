@@ -1,15 +1,15 @@
-package naoki.smallpt.textures;
+package naoki.smallpt.textures.surface;
 
 import naoki.smallpt.primitives.Vec;
 import naoki.smallpt.primitives.Point;
 import naoki.smallpt.primitives.Ray;
 import naoki.smallpt.primitives.combination.Col;
-import naoki.smallpt.textures.surface.Surface;
+import naoki.smallpt.textures.Texture;
 
 public class Polygon extends Surface {
-    final Vec p1, p3;
-    final Vec normal;
-    final Vec e1, e2;
+	public final Vec p1, p3;
+	public final Vec normal;
+	public final Vec e1, e2;
 
     public Polygon(Vec p1, Vec p2, Vec p3, Texture texture) {
         super(p2, texture);

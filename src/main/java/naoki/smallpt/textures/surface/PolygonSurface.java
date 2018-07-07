@@ -1,4 +1,4 @@
-package naoki.smallpt.textures;
+package naoki.smallpt.textures.surface;
 
 import java.util.stream.IntStream;
 import java.time.Instant;
@@ -11,7 +11,7 @@ import naoki.smallpt.primitives.Point;
 import naoki.smallpt.primitives.Ray;
 import naoki.smallpt.primitives.Reflection;
 import naoki.smallpt.primitives.combination.Col;
-import naoki.smallpt.textures.surface.Surface;
+import naoki.smallpt.textures.Texture;
 
 import static org.apache.commons.math3.util.FastMath.abs;
 import static org.apache.commons.math3.util.FastMath.asin;

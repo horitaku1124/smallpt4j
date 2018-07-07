@@ -37,10 +37,10 @@ import naoki.smallpt.primitives.Vec;
 import naoki.smallpt.primitives.combination.Col;
 import naoki.smallpt.textures.BitmapTexture;
 import naoki.smallpt.textures.EmissionTexture;
-import naoki.smallpt.textures.PolygonSurface;
 import naoki.smallpt.textures.SolidTexture;
-import naoki.smallpt.textures.Sphere;
 import naoki.smallpt.textures.surface.Plane;
+import naoki.smallpt.textures.surface.PolygonSurface;
+import naoki.smallpt.textures.surface.Sphere;
 import naoki.smallpt.textures.surface.Surface;
 
 public class SmallPT {
