@@ -212,6 +212,6 @@ public class SmallPT {
         out.setRGB(0, 0, w, h, imagesource, 0, w);
         File f = new File("image.png");
         ImageIO.write(out, "png", f);
-        System.out.println("Version 1.0.2");
+        System.out.println("Version 1.0.3");
     }
 }

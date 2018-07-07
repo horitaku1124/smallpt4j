@@ -1,28 +1,18 @@
 package naoki.smallpt.textures.surface;
 
-import java.util.stream.IntStream;
-import java.time.Instant;
+import static org.apache.commons.math3.util.FastMath.max;
+import static org.apache.commons.math3.util.FastMath.min;
+
 import java.util.Arrays;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import naoki.smallpt.SmallPT;
-import naoki.smallpt.primitives.Vec;
 import naoki.smallpt.primitives.Point;
 import naoki.smallpt.primitives.Ray;
-import naoki.smallpt.primitives.Reflection;
+import naoki.smallpt.primitives.Vec;
 import naoki.smallpt.primitives.combination.Col;
 import naoki.smallpt.textures.Texture;
-
-import static org.apache.commons.math3.util.FastMath.abs;
-import static org.apache.commons.math3.util.FastMath.asin;
-import static org.apache.commons.math3.util.FastMath.atan2;
-import static org.apache.commons.math3.util.FastMath.cos;
-import static org.apache.commons.math3.util.FastMath.floor;
-import static org.apache.commons.math3.util.FastMath.max;
-import static org.apache.commons.math3.util.FastMath.min;
-import static org.apache.commons.math3.util.FastMath.pow;
-import static org.apache.commons.math3.util.FastMath.sin;
-import static org.apache.commons.math3.util.FastMath.sqrt;
 
 public class PolygonSurface extends Surface {
     final Vec center;
