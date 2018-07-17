@@ -2,6 +2,7 @@ package naoki.smallpt;
 
 import org.junit.Test;
 
+import static org.hamcrest.Matchers.closeTo;
 import static org.junit.Assert.*;
 
 import naoki.smallpt.primitives.Vec;
@@ -15,6 +16,10 @@ import naoki.smallpt.textures.surface.Surface;
  * @author naoki
  */
 public class SmallPTTest {
+
+    public static org.hamcrest.Matcher<java.lang.Double> isCloseTo(double expected) {
+        return closeTo(expected, 0.001);
+    }
     
     public SmallPTTest() {
     }

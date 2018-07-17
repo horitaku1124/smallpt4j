@@ -10,12 +10,13 @@ that is released under the MIT License.
 
 package naoki.smallpt;
 
+import static naoki.smallpt.SmallPTUtil.clamp;
+import static naoki.smallpt.SmallPTUtil.getRandom;
+import static naoki.smallpt.SmallPTUtil.toInt;
 import static naoki.smallpt.primitives.Reflection.DIFFUSE;
 import static org.apache.commons.math3.util.FastMath.abs;
 import static org.apache.commons.math3.util.FastMath.cos;
 import static org.apache.commons.math3.util.FastMath.max;
-import static org.apache.commons.math3.util.FastMath.min;
-import static org.apache.commons.math3.util.FastMath.pow;
 import static org.apache.commons.math3.util.FastMath.sin;
 import static org.apache.commons.math3.util.FastMath.sqrt;
 
@@ -25,7 +26,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -52,28 +52,21 @@ public class SmallPT {
     public static final double INF = 1e20;
 
     final Surface spheres[] = {//Scene: radius, position, emission, color, material
-        new Sphere(1e5,  new Vec(1e5 + 1, 40.8, 81.6),   new Vec(), new Vec(.75, .25, .25), Reflection.DIFFUSE),//Left
-        new Sphere(1e5,  new Vec(-1e5 + 99, 40.8, 81.6), new Vec(), new Vec(.25, .25, .75), Reflection.DIFFUSE),//Rght
-        new Sphere(1e5,  new Vec(50, 40.8, 1e5),         new Vec(), new Vec(.75, .75, .75), Reflection.DIFFUSE),//Back
-        new Sphere(1e5,  new Vec(50, 40.8, -1e5 + 170),  new Vec(), new Vec(), Reflection.DIFFUSE),//Frnt
-        new Sphere(1e5,  new Vec(50, 1e5, 81.6),         new Vec(), new Vec(.75, .75, .75), Reflection.DIFFUSE),//Botm
-        new Sphere(1e5,  new Vec(50, -1e5 + 81.6, 81.6), new Vec(), new Vec(.75, .75, .75), Reflection.DIFFUSE),//Top
-        new Sphere(13, new Vec(27, 13, 47),          new Vec(), new Vec(1, 1, 1).mul(.999), Reflection.SPECULAR),//Mirr
-        new Sphere(10, new Vec(73, 10, 78),          new Vec(), new Vec(1, 1, 1).mul(.999), Reflection.REFRECTION),//Glas
-        new Sphere(600,  new Vec(50, 681.6 - .27, 81.6), new Vec(6, 6, 6), new Vec(), Reflection.DIFFUSE), //Lite
+        new Sphere(1e5,  new Vec(1e5 + 1, 40.8, 81.6),   Vec.EMPTY, new Vec(.75, .25, .25), Reflection.DIFFUSE),//Left
+        new Sphere(1e5,  new Vec(-1e5 + 99, 40.8, 81.6), Vec.EMPTY, new Vec(.25, .25, .75), Reflection.DIFFUSE),//Rght
+        new Sphere(1e5,  new Vec(50, 40.8, 1e5),         Vec.EMPTY, new Vec(.75, .75, .75), Reflection.DIFFUSE),//Back
+        new Sphere(1e5,  new Vec(50, 40.8, -1e5 + 170),  Vec.EMPTY, Vec.EMPTY, Reflection.DIFFUSE),//Frnt
+        new Sphere(1e5,  new Vec(50, 1e5, 81.6),         Vec.EMPTY, new Vec(.75, .75, .75), Reflection.DIFFUSE),//Botm
+        new Sphere(1e5,  new Vec(50, -1e5 + 81.6, 81.6), Vec.EMPTY, new Vec(.75, .75, .75), Reflection.DIFFUSE),//Top
+        new Sphere(13, new Vec(27, 13, 47),          Vec.EMPTY, new Vec(1, 1, 1).mul(.999), Reflection.SPECULAR),//Mirr
+        new Sphere(10, new Vec(73, 10, 78),          Vec.EMPTY, new Vec(1, 1, 1).mul(.999), Reflection.REFRECTION),//Glas
+        new Sphere(600,  new Vec(50, 681.6 - .27, 81.6), new Vec(6, 6, 6), Vec.EMPTY, Reflection.DIFFUSE), //Lite
         new Plane(40, 30, new Vec(30, 0, 60), new BitmapTexture("/duke600px.png")),
         new Sphere(10, new Vec(80, 40, 85), new BitmapTexture("/Earth-hires.jpg", .65, 1.5)),
         new Plane(32, 24, new Vec(45, 0, 100), new EmissionTexture("/duke600px.png")),
-        new PolygonSurface(25, new Vec(27, 52, 70), NapoData.cod, NapoData.jun, new SolidTexture(new Vec(), new Vec(.25, .5, .75), DIFFUSE))
+        new PolygonSurface(25, new Vec(27, 52, 70), NapoData.cod, NapoData.jun, new SolidTexture(Vec.EMPTY, new Vec(.25, .5, .75), DIFFUSE))
     };
 
-    static double clamp(double x) {
-        return x < 0 ? 0 : x > 1 ? 1 : x;
-    }
-
-    static int toInt(double x) {
-        return min(255, (int) (pow(clamp(x), RECIP_GAMMA) * 255 + .5));
-    }
 
     boolean intersect(Ray r, double[] t, Surface[] robj) {
         t[0] = INF;
@@ -88,9 +81,6 @@ public class SmallPT {
         return t[0] < INF;
     }
 
-    private static double getRandom() {
-        return ThreadLocalRandom.current().nextDouble();
-    }
     
     Vec radiance(Ray r, int depth) {
         double[] t = {0};                               // distance to intersection
@@ -125,7 +115,7 @@ public class SmallPT {
                         r2 = getRandom(),
                         r2s = sqrt(r2);
                 Vec w = nl,
-                        u = ((abs(w.x) > .1 ? Vec.UNIT_Y : Vec.UNIT_X).mod(w)).normalize(),
+                        u = SmallPTUtil.w2u(w),
                         v = w.mod(u);
                 Vec d = (u.mul(cos(r1) * r2s).add(v.mul(sin(r1) * r2s)).add(w.mul(sqrt(1 - r2)))).normalize();
                 return tex.emission.add(f.vecmul(radiance(new Ray(x, d), depth)));
@@ -173,7 +163,7 @@ public class SmallPT {
 
         Instant start = Instant.now();
         Vec[] c = new Vec[w * h];
-        Arrays.fill(c, new Vec()); // Don't use ZERO
+        Arrays.fill(c, Vec.EMPTY); // Don't use ZERO
 
         AtomicInteger count = new AtomicInteger();
         IntStream.range(0, h).parallel().forEach(y -> {
@@ -182,7 +172,7 @@ public class SmallPT {
                 int i = (h - y - 1) * w + x;
                 for (int sy = 0; sy < 2; sy++) { // 2x2 subpixel rows
                     for (int sx = 0; sx < 2; sx++) {        // 2x2 subpixel cols
-                        Vec r = new Vec(); // Don't use ZERO
+                        Vec r = Vec.EMPTY; // Don't use ZERO
                         for (int s = 0; s < samps; s++) {
                             double r1 = 2 * getRandom(),
                                     dx = r1 < 1 ? sqrt(r1) - 1 : 1 - sqrt(2 - r1);
@@ -212,6 +202,6 @@ public class SmallPT {
         out.setRGB(0, 0, w, h, imagesource, 0, w);
         File f = new File("image.png");
         ImageIO.write(out, "png", f);
-        System.out.println("Version 1.0.3");
+        System.out.println("Version 1.0.4");
     }
 }

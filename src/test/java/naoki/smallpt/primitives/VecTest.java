@@ -2,13 +2,10 @@ package naoki.smallpt.primitives;
 
 import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat; 
-import static org.hamcrest.Matchers.*;
+import static naoki.smallpt.SmallPTTest.isCloseTo;
 
 public class VecTest {
     
-    private org.hamcrest.Matcher<java.lang.Double> isCloseTo(double expected) {
-        return closeTo(expected, 0.001);
-    }
     @Test
     public void testAdd() {
         Vec vec1 = new Vec(1, 1, 1);

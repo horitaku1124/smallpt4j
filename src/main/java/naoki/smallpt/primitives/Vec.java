@@ -6,6 +6,7 @@ public class Vec {        // Usage: time ./smallpt 5000  xv image.ppm
     static final public Vec UNIT_X = new Vec(1, 0, 0);
     static final public Vec UNIT_Y = new Vec(0, 1, 0);
     static final public Vec ZERO = new Vec();
+    static final public Vec EMPTY = new Vec();
 
     public double x, y, z;                  // position, also color (r,g,b)
 
@@ -15,7 +16,8 @@ public class Vec {        // Usage: time ./smallpt 5000  xv image.ppm
         this.z = z;
     }
 
-    public Vec() {
+
+    private Vec() {
         this(0, 0, 0);
     }
 
@@ -55,5 +57,10 @@ public class Vec {        // Usage: time ./smallpt 5000  xv image.ppm
 
     public Vec mod(Vec b) {
         return new Vec(y * b.z - z * b.y, z * b.x - x * b.z, x * b.y - y * b.x);
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("x=%f y=%f z=%f", x, y, z);
     }
 }
