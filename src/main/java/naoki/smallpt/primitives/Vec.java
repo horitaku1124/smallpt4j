@@ -8,7 +8,7 @@ public class Vec {        // Usage: time ./smallpt 5000  xv image.ppm
     static final public Vec ZERO = new Vec();
     static final public Vec EMPTY = new Vec();
 
-    public double x, y, z;                  // position, also color (r,g,b)
+    final public double x, y, z;                  // position, also color (r,g,b)
 
     public Vec(double x, double y, double z) {
         this.x = x;
@@ -42,10 +42,7 @@ public class Vec {        // Usage: time ./smallpt 5000  xv image.ppm
         if (dist == 0) {
             return UNIT_X;
         }
-        x /= dist;
-        y /= dist;
-        z /= dist;
-        return this;
+        return new Vec(x / dist, y / dist, z / dist);
     }
     public double distant() {
         return sqrt(x * x + y * y + z * z);
