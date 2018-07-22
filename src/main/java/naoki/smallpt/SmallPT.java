@@ -14,10 +14,7 @@ import static naoki.smallpt.SmallPTUtil.clamp;
 import static naoki.smallpt.SmallPTUtil.getRandom;
 import static naoki.smallpt.SmallPTUtil.toInt;
 import static naoki.smallpt.primitives.Reflection.DIFFUSE;
-import static org.apache.commons.math3.util.FastMath.abs;
-import static org.apache.commons.math3.util.FastMath.cos;
 import static org.apache.commons.math3.util.FastMath.max;
-import static org.apache.commons.math3.util.FastMath.sin;
 import static org.apache.commons.math3.util.FastMath.sqrt;
 
 import java.awt.image.BufferedImage;
@@ -26,11 +23,13 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import javax.imageio.ImageIO;
 
+import naoki.smallpt.SmallPTUtil.Randomizer;
 import naoki.smallpt.primitives.Ray;
 import naoki.smallpt.primitives.Reflection;
 import naoki.smallpt.primitives.Vec;
@@ -107,18 +106,11 @@ public class SmallPT {
                 return tex.emission; //R.R.
             }
         }
-        if (null == tex.reflection) {
-            throw new IllegalStateException();
-        } else switch(tex.reflection) {
+        switch(tex.reflection) {
             case DIFFUSE:
-                double r1 = 2 * Math.PI * getRandom(),
-                        r2 = getRandom(),
-                        r2s = sqrt(r2);
-                Vec w = nl,
-                        u = SmallPTUtil.w2u(w),
-                        v = w.mod(u);
-                Vec d = (u.mul(cos(r1) * r2s).add(v.mul(sin(r1) * r2s)).add(w.mul(sqrt(1 - r2)))).normalize();
-                return tex.emission.add(f.vecmul(radiance(new Ray(x, d), depth)));
+                Vec u = SmallPTUtil.w2u(nl);
+                Ray xdRay = SmallPTUtil.createXDRay(x, u, nl);
+                return tex.emission.add(f.vecmul(radiance(xdRay, depth)));
             case SPECULAR:
                 // Ideal SPECULAR reflection
                 return tex.emission.add(f.vecmul(radiance(new Ray(x, r.dist.sub(n.mul(2 * n.dot(r.dist)))), depth)));
@@ -152,6 +144,12 @@ public class SmallPT {
     }
 
     public static void main(String... argv) throws IOException {
+        SmallPTUtil.setRandomiwer(new Randomizer() {
+            @Override
+            public double getRandom() {
+                return ThreadLocalRandom.current().nextDouble();
+            }
+        });
         SmallPT sp = new SmallPT();
         int w = 1024,
                 h = 768,
@@ -202,6 +200,6 @@ public class SmallPT {
         out.setRGB(0, 0, w, h, imagesource, 0, w);
         File f = new File("image.png");
         ImageIO.write(out, "png", f);
-        System.out.println("Version 1.0.4");
+        System.out.println("Version 1.0.4.001");
     }
 }

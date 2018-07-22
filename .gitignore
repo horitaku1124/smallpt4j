@@ -1,7 +1,9 @@
 /target/
 /image.png
 /nbproject/
+/jprofiler_images/
 
+.DS_Store
 .classpath
 .project
 .settings/

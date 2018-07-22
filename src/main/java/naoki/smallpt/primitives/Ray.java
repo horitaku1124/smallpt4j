@@ -7,4 +7,9 @@ public class Ray {
         this.obj = o;
         this.dist = d;
     }
+    
+    @Override
+    public String toString() {
+        return "Ray.Obj = " + obj + "\nRay.dist = " + dist;
+    }
 }
