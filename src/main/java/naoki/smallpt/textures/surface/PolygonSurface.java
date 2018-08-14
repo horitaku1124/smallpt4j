@@ -22,23 +22,29 @@ public class PolygonSurface extends Surface {
 
     public PolygonSurface(double rad, Vec pos, double[] vers, int[] surs, Texture tex) {
         super(pos, tex);
+
+        double[] minMaxXYZ = new double[] {
+                Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY,
+                Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY,
+                Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY
+        };
         Vec[] vs = IntStream.range(0, vers.length / 3)
                 .map(i -> i * 3)
                 .mapToObj(i -> new Vec(vers[i], 20 - vers[i + 1], vers[i + 2]))
+                .peek(ver -> {
+                    minMaxXYZ[0] = min(minMaxXYZ[0], ver.x);
+                    minMaxXYZ[1] = max(minMaxXYZ[1], ver.x);
+                    minMaxXYZ[2] = min(minMaxXYZ[2], ver.y);
+                    minMaxXYZ[3] = max(minMaxXYZ[3], ver.y);
+                    minMaxXYZ[4] = min(minMaxXYZ[4], ver.z);
+                    minMaxXYZ[5] = max(minMaxXYZ[5], ver.z);
+                })
                 .toArray(Vec[]::new);
 
-        double minX = Double.POSITIVE_INFINITY, maxX = Double.NEGATIVE_INFINITY;
-        double minY = Double.POSITIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY;
-        double minZ = Double.POSITIVE_INFINITY, maxZ = Double.NEGATIVE_INFINITY;
-        for (Vec ver : vs) {
-            minX = min(minX, ver.x);
-            maxX = max(maxX, ver.x);
-            minY = min(minY, ver.y);
-            maxY = max(maxY, ver.y);
-            minZ = min(minZ, ver.z);
-            maxZ = max(maxZ, ver.z);
-        }
-        center = new Vec((minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2);
+        center = new Vec(
+                (minMaxXYZ[0] + minMaxXYZ[1]) / 2,
+                (minMaxXYZ[2] + minMaxXYZ[3]) / 2,
+                (minMaxXYZ[4] + minMaxXYZ[5]) / 2);
         double r = Double.NEGATIVE_INFINITY;
         for (Vec ver : vs) {
             r = max(r, center.sub(ver).distant());

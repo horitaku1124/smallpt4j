@@ -1,5 +1,7 @@
 package naoki.smallpt.textures.surface;
 
+import static naoki.smallpt.SmallPT.PI_2;
+import static naoki.smallpt.SmallPT.PI_half;
 import static org.apache.commons.math3.util.FastMath.asin;
 import static org.apache.commons.math3.util.FastMath.atan2;
 import static org.apache.commons.math3.util.FastMath.sqrt;
@@ -14,15 +16,18 @@ import naoki.smallpt.textures.Texture;
 
 public class Sphere extends Surface {
 
-    private final double rad;       // radius
+    private final double rad2;       // radius
+    private final double inv_rad;
 
     public Sphere(double rad, Vec p, Vec e, Vec c, Reflection refl) {
         super(p, e, c, refl);
-        this.rad = rad;
+        this.rad2 = rad * rad;
+        this.inv_rad = 1 / rad;
     }
     public Sphere(double rad, Vec p, Texture texture) {
         super(p, texture);
-        this.rad = rad;
+        this.rad2 = rad * rad;
+        this.inv_rad = 1 / rad;
     }
 
     @Override
@@ -30,7 +35,7 @@ public class Sphere extends Surface {
         Vec op = pos.sub(r.obj); // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
         double t,
                 b = op.dot(r.dist),
-                det = b * b - op.dot(op) + rad * rad;
+                det = b * b - op.dot(op) + rad2;
         if (det < 0) {
             return 0;
         }
@@ -47,10 +52,10 @@ public class Sphere extends Surface {
 
     @Override
     public Point makeXY(Vec x) {
-        Vec position = x.sub(pos).mul(1 / rad);
+        Vec position = x.sub(pos).mul(inv_rad);
         double phi = atan2(position.z, position.x);
         double theta = asin(position.y);
-        return new Point(1 - (phi + Math.PI) / (2 * Math.PI), (theta + Math.PI / 2) / Math.PI);
+        return new Point(1 - (phi + Math.PI) / PI_2, (theta + PI_half) / Math.PI);
     }
     
 }

@@ -49,6 +49,19 @@ public class SmallPT {
     static final double RECIP_GAMMA = 1 / GAMMA;
     public static final double EPS = 1e-4;
     public static final double INF = 1e20;
+    public static final double PI_2 = 2 * Math.PI;
+    public static final double PI_half = Math.PI / 2;
+
+    private static final double nc = 1;
+    private static final double nt = 1.5;
+    private static final double ncnt = nc / nt;
+    private static final double ntnc = nt / nc;
+    private static final double n_a = nt - nc;
+    private static final double n_a2 = n_a * n_a;
+    private static final double n_b = nt + nc;
+    private static final double n_b2 = n_b * n_b;
+    private static final double R0 = n_a2 / n_b2;
+    private static final double R0_1 = 1 - R0;
 
     private final Surface spheres[] = {//Scene: radius, position, emission, color, material
         new Sphere(1e5,  new Vec(1e5 + 1, 40.8, 81.6),   Vec.EMPTY, new Vec(.75, .25, .25), Reflection.DIFFUSE),//Left
@@ -65,6 +78,26 @@ public class SmallPT {
         new Plane(32, 24, new Vec(45, 0, 100), new EmissionTexture("/duke600px.png")),
         new PolygonSurface(25, new Vec(27, 52, 70), NapoData.cod, NapoData.jun, new SolidTexture(Vec.EMPTY, new Vec(.25, .5, .75), DIFFUSE))
     };
+
+//    private long diffuseCount = 0;
+//    private long specularCount = 0;
+//    private long reflectionCount = 0;
+
+
+    /**
+     * diffuse=    215686721
+     * specular=     6041808
+     * reflection=   8884850
+     */
+//    synchronized private void incrementDiffuse() {
+//        diffuseCount++;
+//    }
+//    synchronized private void incrementSpecular() {
+//        specularCount++;
+//    }
+//    synchronized private void incrementReflection() {
+//        reflectionCount++;
+//    }
 
 
     private boolean intersect(Ray r, double[] t, Surface[] robj) {
@@ -108,29 +141,29 @@ public class SmallPT {
         }
         switch(tex.reflection) {
             case DIFFUSE:
-                Vec u = SmallPTUtil.w2u(nl);
-                Ray xdRay = SmallPTUtil.createXDRay(x, u, nl);
+//                incrementDiffuse();
+//                Vec u = SmallPTUtil.w2u(nl);
+//                Ray xdRay = SmallPTUtil.createXDRay(x, u, nl);
+                Ray xdRay = SmallPTUtil.w2u_createXDRay(x, nl);
                 return tex.emission.add(f.vecmul(radiance(xdRay, depth)));
             case SPECULAR:
+//                incrementSpecular();
                 // Ideal SPECULAR reflection
                 return tex.emission.add(f.vecmul(radiance(new Ray(x, r.dist.sub(n.mul(2 * n.dot(r.dist)))), depth)));
             case REFRECTION:
+//                incrementReflection();
                 Ray reflectionRay = new Ray(x, r.dist.sub(n.mul(2 * n.dot(r.dist))));     // Ideal dielectric REFRACTION
                 boolean into = n.dot(nl) > 0;                // Ray from outside going in?
-                double nc = 1,
-                        nt = 1.5,
-                        nnt = into ? nc / nt : nt / nc,
+                final double
+                        nnt = into ? ncnt : ntnc,
                         ddn = r.dist.dot(nl),
                         cos2t = 1 - nnt * nnt * (1 - ddn * ddn);
                 if (cos2t < 0) { // Total internal reflection
                     return tex.emission.add(f.vecmul(radiance(reflectionRay, depth)));
                 }
                 Vec tdir = (r.dist.mul(nnt).sub(n.mul((into ? 1 : -1) * (ddn * nnt + sqrt(cos2t))))).normalize();
-                double a = nt - nc,
-                        b = nt + nc,
-                        R0 = a * a / (b * b),
-                        c = 1 - (into ? -ddn : tdir.dot(n));
-                double Re = R0 + (1 - R0) * c * c * c * c * c,
+                double c = 1 - (into ? -ddn : tdir.dot(n));
+                double Re = R0 + R0_1 * c * c * c * c * c,
                         Tr = 1 - Re,
                         probability = .25 + .5 * Re,
                         RP = Re / probability,
@@ -186,6 +219,9 @@ public class SmallPT {
                 }
             }
         });
+//        System.out.println("diffuse=" + sp.diffuseCount);
+//        System.out.println("specular=" + sp.specularCount);
+//        System.out.println("reflection=" + sp.reflectionCount);
 
         Instant finish = Instant.now();
         System.out.printf("Samples:%d Type:%s Time:%s%n",
@@ -200,6 +236,6 @@ public class SmallPT {
         out.setRGB(0, 0, w, h, imagesource, 0, w);
         File f = new File("image.png");
         ImageIO.write(out, "png", f);
-        System.out.println("Version 1.0.4.001");
+        System.out.println("Version 1.0.4.002");
     }
 }
