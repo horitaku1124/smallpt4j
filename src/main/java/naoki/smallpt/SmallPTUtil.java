@@ -14,28 +14,28 @@ public class SmallPTUtil {
     interface Randomizer {
         double getRandom();
     }
-    static Randomizer random;
+    private static Randomizer random;
     static void setRandomiwer(Randomizer r) {
         SmallPTUtil.random = r;
     }
     private static final double PI_2 = 2 * Math.PI;
 
-    public static double clamp(double x) {
+    static double clamp(double x) {
         return x < 0 ? 0 : x > 1 ? 1 : x;
     }
 
-    public static int toInt(double x) {
+    static int toInt(double x) {
         return min(255, (int) (pow(clamp(x), SmallPT.RECIP_GAMMA) * 255 + .5));
     }
 
-    public static double getRandom() {
+    static double getRandom() {
         return random.getRandom();
     }
 
     public static Vec _w2u(Vec w) {
         return ((abs(w.x) > .1 ? Vec.UNIT_Y : Vec.UNIT_X).mod(w)).normalize();
     }
-    public static Vec w2u(Vec w) {
+    static Vec w2u(Vec w) {
         if (w.x > .1 || w.x < -.1) {
             double x = w.z;
             double y = 0;
@@ -71,7 +71,7 @@ public class SmallPTUtil {
                 r2s = sqrt(r2);
         return new Ray(x, (u.mul(cos(r1) * r2s).add(nl.mod(u).mul(sin(r1) * r2s)).add(nl.mul(sqrt(1 - r2)))).normalize());
     }
-    public static Ray createXDRay(Vec x, Vec u, Vec nl) {
+    static Ray createXDRay(Vec x, Vec u, Vec nl) {
         double r1 = PI_2 * getRandom(),
                 r2 = getRandom(),
                 r2s = sqrt(r2),

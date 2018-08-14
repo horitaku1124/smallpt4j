@@ -7,9 +7,9 @@ import naoki.smallpt.primitives.combination.Col;
 import naoki.smallpt.textures.Texture;
 
 public class Polygon extends Surface {
-	public final Vec p1, p3;
-	public final Vec normal;
-	public final Vec e1, e2;
+	final Vec p1, p3;
+	private final Vec normal;
+	private final Vec e1, e2;
 
     public Polygon(Vec p1, Vec p2, Vec p3, Texture texture) {
         super(p2, texture);

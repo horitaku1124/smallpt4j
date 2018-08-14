@@ -43,14 +43,14 @@ import naoki.smallpt.textures.surface.Sphere;
 import naoki.smallpt.textures.surface.Surface;
 
 public class SmallPT {
-    public static final int SAMPLES_DEFAULT = 40;
+    private static final int SAMPLES_DEFAULT = 40;
 
     public static final double GAMMA = 2.2;
-    public static final double RECIP_GAMMA = 1 / GAMMA;
+    static final double RECIP_GAMMA = 1 / GAMMA;
     public static final double EPS = 1e-4;
     public static final double INF = 1e20;
 
-    final Surface spheres[] = {//Scene: radius, position, emission, color, material
+    private final Surface spheres[] = {//Scene: radius, position, emission, color, material
         new Sphere(1e5,  new Vec(1e5 + 1, 40.8, 81.6),   Vec.EMPTY, new Vec(.75, .25, .25), Reflection.DIFFUSE),//Left
         new Sphere(1e5,  new Vec(-1e5 + 99, 40.8, 81.6), Vec.EMPTY, new Vec(.25, .25, .75), Reflection.DIFFUSE),//Rght
         new Sphere(1e5,  new Vec(50, 40.8, 1e5),         Vec.EMPTY, new Vec(.75, .75, .75), Reflection.DIFFUSE),//Back
@@ -67,7 +67,7 @@ public class SmallPT {
     };
 
 
-    boolean intersect(Ray r, double[] t, Surface[] robj) {
+    private boolean intersect(Ray r, double[] t, Surface[] robj) {
         t[0] = INF;
         for (Surface obj : spheres) {
             Surface[] cobj = {null};
@@ -81,7 +81,7 @@ public class SmallPT {
     }
 
     
-    Vec radiance(Ray r, int depth) {
+    private Vec radiance(Ray r, int depth) {
         double[] t = {0};                               // distance to intersection
         Surface[] robj = {null};
         Vec[] rn = {null};

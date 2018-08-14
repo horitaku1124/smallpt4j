@@ -9,8 +9,8 @@ import naoki.smallpt.primitives.combination.Col;
 import naoki.smallpt.textures.surface.Surface;
 
 public class CheckTexture extends Texture {
-    final Col col1, col2;
-    final double freq;
+    private final Col col1, col2;
+    private final double freq;
 
     public CheckTexture(Vec col1, Vec col2, double freq) {
         this.col1 = new Col(Vec.ZERO, col1, DIFFUSE);

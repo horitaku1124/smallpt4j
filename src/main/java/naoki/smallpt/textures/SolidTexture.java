@@ -6,7 +6,7 @@ import naoki.smallpt.primitives.combination.Col;
 import naoki.smallpt.textures.surface.Surface;
 
 public class SolidTexture extends Texture {
-    final Col col;
+    private final Col col;
 
     public SolidTexture(Vec emission, Vec color, Reflection ref) {
         this.col = new Col(emission, color, ref);

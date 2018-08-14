@@ -15,11 +15,10 @@ import naoki.smallpt.primitives.combination.Col;
 import naoki.smallpt.textures.Texture;
 
 public class PolygonSurface extends Surface {
-    final Vec center;
-    final double rad;
-    final Polygon[] polygons;
-    final Vec[] vertexes;
-    final Sphere bound;
+    private final Vec center;
+    private final Polygon[] polygons;
+    private final Vec[] vertexes;
+    private final Sphere bound;
 
     public PolygonSurface(double rad, Vec pos, double[] vers, int[] surs, Texture tex) {
         super(pos, tex);
@@ -44,7 +43,6 @@ public class PolygonSurface extends Surface {
         for (Vec ver : vs) {
             r = max(r, center.sub(ver).distant());
         }
-        this.rad = rad;
         double t = rad / r;
         bound = new Sphere(rad, pos, tex);
         vertexes = Arrays.stream(vs)

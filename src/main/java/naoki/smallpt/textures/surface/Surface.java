@@ -9,8 +9,8 @@ import naoki.smallpt.textures.SolidTexture;
 import naoki.smallpt.textures.Texture;
 
 public abstract class Surface {
-    final public Vec pos;
-    final public Texture texture;
+    final Vec pos;
+    final Texture texture;
 
     public Surface(Vec pos, Texture texture) {
         this.pos = pos;

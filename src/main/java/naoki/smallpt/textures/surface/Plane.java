@@ -9,7 +9,7 @@ import naoki.smallpt.primitives.combination.Col;
 import naoki.smallpt.textures.Texture;
 
 final public class Plane extends Surface {
-    final double width, height;
+    private final double width, height;
     public Plane(double x, double y, Vec pos, Vec emission, Vec color, Reflection reflection) {
         super(pos, emission, color, reflection);
         this.width = x;
@@ -41,8 +41,8 @@ final public class Plane extends Surface {
         return d;
     }
 
-    static final Vec TO_FRONT = new Vec(0, 0, 1);
-    static final Vec TO_BACK = new Vec(0, 0, -1);
+    private static final Vec TO_FRONT = new Vec(0, 0, 1);
+    private static final Vec TO_BACK = new Vec(0, 0, -1);
     
     @Override
     public void position(Vec p, Ray r, Vec[] n, Col[] c) {

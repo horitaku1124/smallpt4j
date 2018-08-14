@@ -16,11 +16,11 @@ import naoki.smallpt.primitives.combination.Col;
 import naoki.smallpt.textures.surface.Surface;
 
 public class BitmapTexture extends Texture {
-    final BufferedImage img;
-    final int width, height;
-    final Vec emission = Vec.ZERO;
-    final double enhance;
-    final double offset;
+    private final BufferedImage img;
+    private final int width, height;
+    private final Vec emission = Vec.ZERO;
+    private final double enhance;
+    private final double offset;
 
     public BitmapTexture(String file, double offset, double e) {
         try {
@@ -54,7 +54,7 @@ public class BitmapTexture extends Texture {
         return rgb >> 24 != 0;
     }
     
-    protected int getRgb(Surface s, Vec x) {
+    int getRgb(Surface s, Vec x) {
         Point pos = s.makeXY(x);
         return img.getRGB((int)((pos.x + offset) * width) % width, (int)((1 - pos.y) * height));
     }

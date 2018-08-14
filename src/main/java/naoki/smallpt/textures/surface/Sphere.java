@@ -14,7 +14,7 @@ import naoki.smallpt.textures.Texture;
 
 public class Sphere extends Surface {
 
-    final double rad;       // radius
+    private final double rad;       // radius
 
     public Sphere(double rad, Vec p, Vec e, Vec c, Reflection refl) {
         super(p, e, c, refl);

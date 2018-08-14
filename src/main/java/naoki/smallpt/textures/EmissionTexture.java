@@ -7,8 +7,8 @@ import naoki.smallpt.primitives.combination.Col;
 import naoki.smallpt.textures.surface.Surface;
 
 public class EmissionTexture extends BitmapTexture {
-    final Vec emission = new Vec(12, 12, 12);
-    final Vec color = Vec.ZERO;
+    private final Vec emission = new Vec(12, 12, 12);
+    private final Vec color = Vec.ZERO;
     public EmissionTexture(String file) {
         super(file);
     }
