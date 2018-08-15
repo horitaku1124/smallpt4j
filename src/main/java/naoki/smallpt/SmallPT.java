@@ -10,26 +10,6 @@ that is released under the MIT License.
 
 package naoki.smallpt;
 
-import static naoki.smallpt.SmallPTUtil.clamp;
-import static naoki.smallpt.SmallPTUtil.getRandom;
-import static naoki.smallpt.SmallPTUtil.toInt;
-import static naoki.smallpt.primitives.Reflection.DIFFUSE;
-import static org.apache.commons.math3.util.FastMath.max;
-import static org.apache.commons.math3.util.FastMath.sqrt;
-
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.IntStream;
-
-import javax.imageio.ImageIO;
-
-import naoki.smallpt.SmallPTUtil.Randomizer;
 import naoki.smallpt.primitives.Ray;
 import naoki.smallpt.primitives.Reflection;
 import naoki.smallpt.primitives.Vec;
@@ -41,6 +21,22 @@ import naoki.smallpt.textures.surface.Plane;
 import naoki.smallpt.textures.surface.PolygonSurface;
 import naoki.smallpt.textures.surface.Sphere;
 import naoki.smallpt.textures.surface.Surface;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
+
+import static naoki.smallpt.SmallPTUtil.*;
+import static naoki.smallpt.primitives.Reflection.DIFFUSE;
+import static org.apache.commons.math3.util.FastMath.max;
+import static org.apache.commons.math3.util.FastMath.sqrt;
 
 public class SmallPT {
     private static final int SAMPLES_DEFAULT = 40;
@@ -175,12 +171,7 @@ public class SmallPT {
     }
 
     public static void main(String... argv) throws IOException {
-        SmallPTUtil.setRandomiwer(new Randomizer() {
-            @Override
-            public double getRandom() {
-                return ThreadLocalRandom.current().nextDouble();
-            }
-        });
+        SmallPTUtil.setRandomiwer(() -> ThreadLocalRandom.current().nextDouble());
         SmallPT sp = new SmallPT();
         int w = 1024,
                 h = 768,
