@@ -142,8 +142,6 @@ public class SmallPT {
         switch(tex.reflection) {
             case DIFFUSE:
 //                incrementDiffuse();
-//                Vec u = SmallPTUtil.w2u(nl);
-//                Ray xdRay = SmallPTUtil.createXDRay(x, u, nl);
                 Ray xdRay = SmallPTUtil.w2u_createXDRay(x, nl);
                 return tex.emission.add(f.vecmul(radiance(xdRay, depth)));
             case SPECULAR:
