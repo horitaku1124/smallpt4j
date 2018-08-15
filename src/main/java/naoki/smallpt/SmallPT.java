@@ -109,6 +109,7 @@ public class SmallPT {
         return t[0] < INF;
     }
 
+    SmallPTLibs spl = new SmallPTLibs();
     
     private Vec radiance(Ray r, int depth) {
         double[] t = {0};                               // distance to intersection
@@ -138,8 +139,9 @@ public class SmallPT {
         switch(tex.reflection) {
             case DIFFUSE:
 //                incrementDiffuse();
-                Ray xdRay = SmallPTUtil.w2u_createXDRay(x, nl);
-                return tex.emission.add(f.vecmul(radiance(xdRay, depth)));
+//                Ray xdRay = SmallPTUtil.w2u_createXDRay(x, nl);
+                double[] a = spl.createXDRay(nl.x, nl.y, nl.z);
+                return tex.emission.add(f.vecmul(radiance(new Ray(x, new Vec(a[0], a[1], a[2])), depth)));
             case SPECULAR:
 //                incrementSpecular();
                 // Ideal SPECULAR reflection
