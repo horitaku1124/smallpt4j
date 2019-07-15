@@ -7,10 +7,7 @@ import static org.apache.commons.math3.util.FastMath.atan2;
 import static org.apache.commons.math3.util.FastMath.sqrt;
 
 import naoki.smallpt.SmallPT;
-import naoki.smallpt.primitives.Point;
-import naoki.smallpt.primitives.Ray;
-import naoki.smallpt.primitives.Reflection;
-import naoki.smallpt.primitives.Vec;
+import naoki.smallpt.primitives.*;
 import naoki.smallpt.primitives.combination.Col;
 import naoki.smallpt.textures.Texture;
 
@@ -19,7 +16,7 @@ public class Sphere extends Surface {
     private final double rad2;       // radius
     private final double inv_rad;
 
-    public Sphere(double rad, Vec p, Vec e, Vec c, Reflection refl) {
+    public Sphere(double rad, Vec p, Vec e, RGB c, Reflection refl) {
         super(p, e, c, refl);
         this.rad2 = rad * rad;
         this.inv_rad = 1 / rad;

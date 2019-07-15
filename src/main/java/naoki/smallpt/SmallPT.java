@@ -30,6 +30,7 @@ import java.util.stream.IntStream;
 import javax.imageio.ImageIO;
 
 import naoki.smallpt.SmallPTUtil.Randomizer;
+import naoki.smallpt.primitives.RGB;
 import naoki.smallpt.primitives.Ray;
 import naoki.smallpt.primitives.Reflection;
 import naoki.smallpt.primitives.Vec;
@@ -64,18 +65,18 @@ public class SmallPT {
     private static final double R0_1 = 1 - R0;
 
     private final Surface spheres[] = {//Scene: radius, position, emission, color, material
-        new Sphere(1e5,  new Vec(1e5 + 1, 40.8, 81.6),   Vec.EMPTY, new Vec(.75, .25, .25), Reflection.DIFFUSE),//Left
-        new Sphere(1e5,  new Vec(-1e5 + 99, 40.8, 81.6), Vec.EMPTY, new Vec(.25, .25, .75), Reflection.DIFFUSE),//Rght
-        new Sphere(1e5,  new Vec(50, 40.8, 1e5),         Vec.EMPTY, new Vec(.75, .75, .75), Reflection.DIFFUSE),//Back
-        new Sphere(1e5,  new Vec(50, 40.8, -1e5 + 170),  Vec.EMPTY, Vec.EMPTY, Reflection.DIFFUSE),//Frnt
-        new Sphere(1e5,  new Vec(50, 1e5, 81.6),         Vec.EMPTY, new Vec(.75, .75, .75), Reflection.DIFFUSE),//Botm
-        new Sphere(1e5,  new Vec(50, -1e5 + 81.6, 81.6), Vec.EMPTY, new Vec(.75, .75, .75), Reflection.DIFFUSE),//Top
-        new Sphere(13, new Vec(27, 13, 47),          Vec.EMPTY, new Vec(1, 1, 1).mul(.999), Reflection.SPECULAR),//Mirr
-        new Sphere(10, new Vec(73, 10, 78),          Vec.EMPTY, new Vec(1, 1, 1).mul(.999), Reflection.REFRECTION),//Glas
-        new Sphere(600,  new Vec(50, 681.6 - .27, 81.6), new Vec(6, 6, 6), Vec.EMPTY, Reflection.DIFFUSE), //Lite
+        new Sphere(1e5,  new Vec(1e5 + 1, 40.8, 81.6),   Vec.EMPTY, new RGB(.75, .25, .25), Reflection.DIFFUSE),//Left Red Tile
+        new Sphere(1e5,  new Vec(-1e5 + 99, 40.8, 81.6), Vec.EMPTY, new RGB(.25, .25, .75), Reflection.DIFFUSE),//Rght Blue Tile
+        new Sphere(1e5,  new Vec(50, 40.8, 1e5),         Vec.EMPTY, new RGB(.75, .75, .75), Reflection.DIFFUSE),//Back
+        new Sphere(1e5,  new Vec(50, 40.8, -1e5 + 170),  Vec.EMPTY, RGB.EMPTY, Reflection.DIFFUSE),//Frnt
+        new Sphere(1e5,  new Vec(50, 1e5, 81.6),         Vec.EMPTY, new RGB(.75, .75, .75), Reflection.DIFFUSE),//Botm
+        new Sphere(1e5,  new Vec(50, -1e5 + 81.6, 81.6), Vec.EMPTY, new RGB(.75, .75, .75), Reflection.DIFFUSE),//Top
+        new Sphere(13, new Vec(27, 13, 47),          Vec.EMPTY, new RGB(1, 1, 1).mul(.999), Reflection.SPECULAR),//Mirr
+        new Sphere(10, new Vec(73, 10, 78),          Vec.EMPTY, new RGB(1, 1, 1).mul(.999), Reflection.REFRECTION),//Glas
+        new Sphere(600,  new Vec(50, 681.6 - .27, 81.6), new RGB(6, 6, 6), RGB.EMPTY, Reflection.DIFFUSE), // Top Light
         new Plane(40, 30, new Vec(30, 0, 60), new BitmapTexture("/duke600px.png")),
         new Sphere(10, new Vec(80, 40, 85), new BitmapTexture("/Earth-hires.jpg", .65, 1.5)),
-        new Plane(32, 24, new Vec(45, 0, 100), new EmissionTexture("/duke600px.png")),
+        new Plane(32, 24, new Vec(45, 0, 100), new EmissionTexture("/duke600px.png")), // Front shining Duke
         new PolygonSurface(25, new Vec(27, 52, 70), NapoData.cod, NapoData.jun, new SolidTexture(Vec.EMPTY, new Vec(.25, .5, .75), DIFFUSE))
     };
 

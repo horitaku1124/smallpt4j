@@ -17,7 +17,7 @@ public class Vec {        // Usage: time ./smallpt 5000  xv image.ppm
     }
 
 
-    private Vec() {
+    protected Vec() {
         this(0, 0, 0);
     }
 
