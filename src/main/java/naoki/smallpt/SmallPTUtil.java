@@ -1,14 +1,15 @@
 package naoki.smallpt;
 
-import static org.apache.commons.math3.util.FastMath.abs;
-import static org.apache.commons.math3.util.FastMath.cos;
-import static org.apache.commons.math3.util.FastMath.min;
-import static org.apache.commons.math3.util.FastMath.pow;
-import static org.apache.commons.math3.util.FastMath.sin;
-import static org.apache.commons.math3.util.FastMath.sqrt;
-
 import naoki.smallpt.primitives.Ray;
 import naoki.smallpt.primitives.Vec;
+
+import static java.lang.Math.min;
+import static java.lang.Math.pow;
+import static java.lang.Math.abs;
+import static java.lang.Math.sqrt;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+//import static naoki.smallpt.FakeMath.sqrt;
 
 public class SmallPTUtil {
     interface Randomizer {

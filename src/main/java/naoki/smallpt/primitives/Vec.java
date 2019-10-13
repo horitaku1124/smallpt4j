@@ -1,6 +1,7 @@
 package naoki.smallpt.primitives;
 
-import static org.apache.commons.math3.util.FastMath.sqrt;
+import static java.lang.Math.sqrt;
+//import static naoki.smallpt.FakeMath.sqrt;
 
 public class Vec {        // Usage: time ./smallpt 5000  xv image.ppm
     static final public Vec UNIT_X = new Vec(1, 0, 0);

@@ -1,7 +1,7 @@
 package naoki.smallpt.textures;
 
+import static java.lang.Math.pow;
 import static naoki.smallpt.primitives.Reflection.DIFFUSE;
-import static org.apache.commons.math3.util.FastMath.pow;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

@@ -1,7 +1,7 @@
 package naoki.smallpt.textures;
 
+import static java.lang.Math.floor;
 import static naoki.smallpt.primitives.Reflection.DIFFUSE;
-import static org.apache.commons.math3.util.FastMath.floor;
 
 import naoki.smallpt.primitives.Point;
 import naoki.smallpt.primitives.Vec;

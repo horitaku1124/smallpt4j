@@ -1,8 +1,5 @@
 package naoki.smallpt.textures.surface;
 
-import static org.apache.commons.math3.util.FastMath.max;
-import static org.apache.commons.math3.util.FastMath.min;
-
 import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -13,6 +10,9 @@ import naoki.smallpt.primitives.Ray;
 import naoki.smallpt.primitives.Vec;
 import naoki.smallpt.primitives.combination.Col;
 import naoki.smallpt.textures.Texture;
+
+import static java.lang.Math.min;
+import static java.lang.Math.max;
 
 public class PolygonSurface extends Surface {
     private final Vec center;

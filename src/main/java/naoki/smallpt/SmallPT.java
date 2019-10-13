@@ -10,12 +10,13 @@ that is released under the MIT License.
 
 package naoki.smallpt;
 
+import static java.lang.Math.max;
+import static java.lang.Math.sqrt;
+//import static naoki.smallpt.FakeMath.sqrt;
 import static naoki.smallpt.SmallPTUtil.clamp;
 import static naoki.smallpt.SmallPTUtil.getRandom;
 import static naoki.smallpt.SmallPTUtil.toInt;
 import static naoki.smallpt.primitives.Reflection.DIFFUSE;
-import static org.apache.commons.math3.util.FastMath.max;
-import static org.apache.commons.math3.util.FastMath.sqrt;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

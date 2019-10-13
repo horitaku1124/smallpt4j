@@ -1,10 +1,11 @@
 package naoki.smallpt.textures.surface;
 
+import static java.lang.Math.asin;
+import static java.lang.Math.atan2;
+import static java.lang.Math.sqrt;
 import static naoki.smallpt.SmallPT.PI_2;
 import static naoki.smallpt.SmallPT.PI_half;
-import static org.apache.commons.math3.util.FastMath.asin;
-import static org.apache.commons.math3.util.FastMath.atan2;
-import static org.apache.commons.math3.util.FastMath.sqrt;
+//import static naoki.smallpt.FakeMath.sqrt;
 
 import naoki.smallpt.SmallPT;
 import naoki.smallpt.primitives.Point;
